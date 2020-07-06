@@ -1,0 +1,1 @@
+console.log("desde archivo admin.js");

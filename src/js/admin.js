@@ -3,6 +3,8 @@ import 'bootstrap';
 import '../css/style.css';
 import Funko from './funko.js';
 import $ from 'jquery';
+import Swal from 'sweetalert2';
+import '@fortawesome/fontawesome-free/js/all.min.js';
 
 //inicializo variables
 let productos = [];
@@ -45,7 +47,15 @@ window.agregarProducto = function() {
 		//limpiar formulario
 		limpiarFormulario();
 		leerProductos();
-	
+
+		let ventanaModal = document.getElementById('modalProducto');
+		$(ventanaModal).modal('hide');
+		
+		Swal.fire(
+			'Operacion exitosa',
+			'Se agrego un nuevo producto al catalogo',
+			'success'
+		  )
 };
 
 //funciones para validar campos
@@ -102,9 +112,10 @@ function dibujarFilas(_productos) {
         <td>$${_productos[i].precio}</td>
         <td>${_productos[i].imagen}</td>
         <td>
-            <button class="btn btn-outline-info" onclick="editarProducto(${_productos[i].codigo})">Editar</button>
+			<button class="btn btn-outline-info" onclick="editarProducto(${_productos[i].codigo})">
+			<i class="fas fa-edit"></i></button>
             <button class="btn btn-outline-danger" onclick="eliminarProducto(this)" id="${_productos[i]
-				.codigo}">Borrar</button>
+				.codigo}"><i class="fas fa-trash"></i></button>
         </td>
     </tr>`;
 
@@ -124,6 +135,34 @@ function borrarFilas() {
 window.eliminarProducto = function(prod) {
 	console.log(prod);
 
+	Swal.fire({
+		title: 'Esta seguro de eliminar el producto?',
+		text: "No puedes volver esta operacion atras",
+		icon: 'warning',
+		showCancelButton: true,
+		confirmButtonColor: '#3085d6',
+		cancelButtonColor: '#d33',
+		confirmButtonText: 'Borrar'
+	  }).then((result) => {
+		if (result.value) {
+			console.log(result.value);
+			let arregloFiltrado = productos.filter(function(item) {
+				return item.codigo != prod.id;
+			});
+		
+			localStorage.setItem('funkopopKey', JSON.stringify(arregloFiltrado));
+			productos = arregloFiltrado;
+			leerProductos();
+		
+			console.log(arregloFiltrado);
+
+		  Swal.fire(
+			'Producto eliminado',
+			'El producto fue eliminado satisfactoriamente',
+			'success'
+		  )
+		}
+	  })
 	//buscar un objeto en el arreglo
 	// for(let i in productos){
 	//     if(productos[i].codigo == prod.id ){
@@ -131,15 +170,7 @@ window.eliminarProducto = function(prod) {
 	//     }
 	// }
 
-	let arregloFiltrado = productos.filter(function(item) {
-		return item.codigo != prod.id;
-	});
 
-	localStorage.setItem('funkopopKey', JSON.stringify(arregloFiltrado));
-	productos = arregloFiltrado;
-	leerProductos();
-
-	console.log(arregloFiltrado);
 };
 
 window.editarProducto = function(codigo) {

@@ -10,8 +10,8 @@ leerProductos();
 
 let productoExistente = false; // false = producto es nuevo; true= modificar producto
 
-window.agregarProducto = function(event) {
-	event.preventDefault();
+window.agregarProducto = function() {
+
 	console.log('desde agregar producto');
 	//crear variables
 	let codigo = document.getElementById('codigo'),
@@ -23,17 +23,7 @@ window.agregarProducto = function(event) {
 		imagen = document.getElementById('imagen'),
 		stock = document.getElementById('stock');
 
-	//validar formulario
-	if (
-		validarNumeros(codigo) &&
-		campoRequerido(nombre) &&
-		campoRequerido(numSerie) &&
-		campoRequerido(categoria) &&
-		campoRequerido(descripcion) &&
-		validarNumeros(precio) &&
-		campoRequerido(imagen) &&
-		validarNumeros(stock)
-	) {
+	
 		// crear el objeto
 		let productoFunko = new Funko(
 			codigo.value,
@@ -53,9 +43,9 @@ window.agregarProducto = function(event) {
 		localStorage.setItem('funkopopKey', JSON.stringify(productos));
 
 		//limpiar formulario
-        limpiarFormulario()
+		limpiarFormulario();
 		leerProductos();
-	}
+	
 };
 
 //funciones para validar campos
@@ -170,68 +160,89 @@ window.editarProducto = function(codigo) {
 	document.getElementById('descripcion').value = objetoEncontrado.descripcion;
 	document.getElementById('stock').value = objetoEncontrado.stock;
 	document.getElementById('precio').value = objetoEncontrado.precio;
-    document.getElementById('imagen').value = objetoEncontrado.imagen;
-    
-    //cambiar el valor  de la variable bandera
-    productoExistente = true;
-    //abrir la ventana modal
-    $(modalProducto).modal('show');
+	document.getElementById('imagen').value = objetoEncontrado.imagen;
+
+	//cambiar el valor  de la variable bandera
+	productoExistente = true;
+	//abrir la ventana modal
+	$(modalProducto).modal('show');
 };
 
-window.guardarDatos = function(event){
+window.guardarDatos = function(event) {
+	event.preventDefault();
+	//agregar validaciones
+	//crear variables
+	let codigo = document.getElementById('codigo'),
+		nombre = document.getElementById('nombre'),
+		numSerie = document.getElementById('numSerie'),
+		categoria = document.getElementById('categoria'),
+		descripcion = document.getElementById('descripcion'),
+		precio = document.getElementById('precio'),
+		imagen = document.getElementById('imagen'),
+		stock = document.getElementById('stock');
 
-    if(productoExistente == false){
-        //agregar un nuevo producto
-        agregarProducto(event);
-    }else{
-        //modificar el producto 
-     
-        productoModificado(event);
-    }
-}
+	//validar formulario
+	if (
+		validarNumeros(codigo) &&
+		campoRequerido(nombre) &&
+		campoRequerido(numSerie) &&
+		campoRequerido(categoria) &&
+		campoRequerido(descripcion) &&
+		validarNumeros(precio) &&
+		campoRequerido(imagen) &&
+		validarNumeros(stock)
+	) {
+		if (productoExistente == false) {
+			//agregar un nuevo producto
+			agregarProducto();
+		} else {
+			//modificar el producto
+			productoModificado();
+		}
+	}else{
+		alert("completar todos los campos");
+	}
+};
 
-function productoModificado(event){
-    
-    event.preventDefault();
-    console.log("guardando datos del producto");
+function productoModificado() {
 
-    //tomar los datos modificados del form
-    let codigo = document.getElementById('codigo').value,
+	console.log('guardando datos del producto');
+	//tomar los datos modificados del form
+	let codigo = document.getElementById('codigo').value,
 		nombre = document.getElementById('nombre').value,
 		numSerie = document.getElementById('numSerie').value,
 		categoria = document.getElementById('categoria').value,
 		descripcion = document.getElementById('descripcion').value,
 		precio = document.getElementById('precio').value,
 		imagen = document.getElementById('imagen').value,
-        stock = document.getElementById('stock').value;
-        
-    //actualizar esos datos en el arreglo
-    for(let i in productos){
-        if(productos[i].codigo == codigo){
-            //encontramos el producto
-            productos[i].nombre = nombre;
-            productos[i].numSerie = numSerie;
-            productos[i].categoria =categoria;
-            productos[i].descripcion = descripcion;
-            productos[i].stock = stock;
-            productos[i].precio = precio;
-            productos[i].imagen = imagen;
-        }
-    }
+		stock = document.getElementById('stock').value;
 
-    //actualizamos el localstorage
-    localStorage.setItem("funkopopKey", JSON.stringify(productos));
+	//actualizar esos datos en el arreglo
+	for (let i in productos) {
+		if (productos[i].codigo == codigo) {
+			//encontramos el producto
+			productos[i].nombre = nombre;
+			productos[i].numSerie = numSerie;
+			productos[i].categoria = categoria;
+			productos[i].descripcion = descripcion;
+			productos[i].stock = stock;
+			productos[i].precio = precio;
+			productos[i].imagen = imagen;
+		}
+	}
 
-    limpiarFormulario();
-    //actualizar filas de la tabla
-    leerProductos();
+	//actualizamos el localstorage
+	localStorage.setItem('funkopopKey', JSON.stringify(productos));
 
-    let modalProducto = document.getElementById('modalProducto');
-    $(modalProducto).modal('hide');
+	limpiarFormulario();
+	//actualizar filas de la tabla
+	leerProductos();
 
+	let modalProducto = document.getElementById('modalProducto');
+	$(modalProducto).modal('hide');
 }
 
-function limpiarFormulario(){
-    document.getElementById('formProducto').reset();
-    productoExistente = false;
-}
+window.limpiarFormulario = function() {
+	document.getElementById('formProducto').reset();
+	productoExistente = false;
+};
